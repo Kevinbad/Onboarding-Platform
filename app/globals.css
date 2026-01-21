@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Add custom fonts if needed, though they are usually automatic if defined in base */
+  /* --font-sans: var(--font-inter); */
+  /* --font-mono: var(--font-roboto-mono); */
+}
+
+:root {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-roboto-mono);
+
+  /* Forced Dark Theme matching the image */
+  --background: #0f1225;
+  /* Deep dark blue */
+  --foreground: #f8fafc;
+
+  --card: #1a1f36;
+  /* Slightly lighter dark blue for card */
+  --card-foreground: #f8fafc;
+
+  --popover: #1a1f36;
+  --popover-foreground: #f8fafc;
+
+  --primary: #6366f1;
+  /* Indigo base */
+  --primary-foreground: #ffffff;
+
+  --secondary: #334155;
+  --secondary-foreground: #f8fafc;
+
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+
+  --accent: #334155;
+  --accent-foreground: #f8fafc;
+
+  --destructive: #7f1d1d;
+  --destructive-foreground: #fef2f2;
+
+  --border: #334155;
+  --input: #242b45;
+  /* Darker input background */
+  --ring: #6366f1;
+
+  --radius: 1rem;
+  /* Rounded corners like in the image */
+
+  --chart-1: #3b82f6;
+  --chart-2: #8b5cf6;
+  --chart-3: #f43f5e;
+  --chart-4: #10b981;
+  --chart-5: #f59e0b;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    /* Main background gradient from image */
+    background: radial-gradient(circle at center, #1e2548 0%, #0a0d1e 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-[#1a1f36]/80 backdrop-blur-md border border-white/5;
+  }
+
+  .glass-card {
+    @apply bg-[#1a1f36] border border-white/5 shadow-2xl shadow-indigo-500/10;
+  }
+
+  /* Specific gradient for the main button */
+  .btn-gradient {
+    @apply bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white shadow-lg shadow-blue-900/20;
+  }
+}

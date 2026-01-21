@@ -1,0 +1,37 @@
+
+> onboarding-platform@0.1.0 lint
+> eslint
+
+
+C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\app\(auth)\login\actions.ts
+   6:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  23:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\app\dashboard\onboarding-wizard.tsx
+  11:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\components\onboarding\FinancialStep.tsx
+  11:46  warning  'CardFooter' is defined but never used    @typescript-eslint/no-unused-vars
+  22:19  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  64:25  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\components\onboarding\LegalStep.tsx
+  11:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  46:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\components\onboarding\ProfileStep.tsx
+  11:46  warning  'CardFooter' is defined but never used    @typescript-eslint/no-unused-vars
+  23:19  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  61:25  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\lib\supabase\server.ts
+  1:35  warning  'CookieOptions' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\middleware.ts
+   1:35  warning  'CookieOptions' is defined but never used            @typescript-eslint/no-unused-vars
+   5:9   error    'response' is never reassigned. Use 'const' instead  prefer-const
+  33:14  warning  'e' is defined but never used                        @typescript-eslint/no-unused-vars
+
+✖ 15 problems (10 errors, 5 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

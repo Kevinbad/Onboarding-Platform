@@ -1,0 +1,95 @@
+
+> onboarding-platform@0.1.0 dev
+> next dev
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\kevod\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\package-lock.json
+
+▲ Next.js 16.1.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.56.1:3000
+- Environments: .env.local
+
+✓ Starting...
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 3s
+Error: Cannot apply unknown utility class `border-border`
+    [2m[at onInvalidCandidate (C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\node_modules\tailwindcss\dist\lib.js:21:1511)][0m
+    [2m[at Te (C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\node_modules\tailwindcss\dist\lib.js:16:36652)][0m
+    [2m[at C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\node_modules\tailwindcss\dist\lib.js:21:355][0m
+    [2m[at Rr (C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\node_modules\tailwindcss\dist\lib.js:3:1718)][0m
+    [2m[at _ (C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\node_modules\tailwindcss\dist\lib.js:3:1377)][0m
+    [2m[at $e (C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\node_modules\tailwindcss\dist\lib.js:21:172)][0m
+    [2m[at un (C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\node_modules\tailwindcss\dist\lib.js:38:294)][0m
+    [2m[at async cn (C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\node_modules\tailwindcss\dist\lib.js:38:631)][0m
+    [2m[at async Xr (C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\node_modules\@tailwindcss\node\dist\index.js:10:3417)][0m
+    [2m[at async I (C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\node_modules\@tailwindcss\postcss\dist\index.js:10:3977)][0m
+⨯ ./OneDrive/Documents/Personal projects/Onboarding Platform/onboarding-platform/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\app\globals.css:1:1: Cannot apply unknown utility class `border-border`
+    [at Input.error (turbopack:///[project]/OneDrive/Documents/Personal projects/Onboarding Platform/onboarding-platform/node_modules/postcss/lib/input.js:135:16)]
+    [at Root.error (turbopack:///[project]/OneDrive/Documents/Personal projects/Onboarding Platform/onboarding-platform/node_modules/postcss/lib/node.js:146:32)]
+    [at Object.Once (C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\node_modules\@tailwindcss\postcss\dist\index.js:10:6911)]
+    [at async LazyResult.runAsync (turbopack:///[project]/OneDrive/Documents/Personal projects/Onboarding Platform/onboarding-platform/node_modules/postcss/lib/lazy-result.js:293:11)]
+    [at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34)]
+    [at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23)]
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Documents/Personal projects/Onboarding Platform/onboarding-platform/app/globals.css [Client Component Browser]
+    ./OneDrive/Documents/Personal projects/Onboarding Platform/onboarding-platform/app/layout.tsx [Server Component]
+
+
+⨯ ./OneDrive/Documents/Personal projects/Onboarding Platform/onboarding-platform/app/globals.css
+Error evaluating Node.js code
+CssSyntaxError: tailwindcss: C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\app\globals.css:1:1: Cannot apply unknown utility class `border-border`
+    [at Input.error (turbopack:///[project]/OneDrive/Documents/Personal projects/Onboarding Platform/onboarding-platform/node_modules/postcss/lib/input.js:135:16)]
+    [at Root.error (turbopack:///[project]/OneDrive/Documents/Personal projects/Onboarding Platform/onboarding-platform/node_modules/postcss/lib/node.js:146:32)]
+    [at Object.Once (C:\Users\kevod\OneDrive\Documents\Personal projects\Onboarding Platform\onboarding-platform\node_modules\@tailwindcss\postcss\dist\index.js:10:6911)]
+    [at async LazyResult.runAsync (turbopack:///[project]/OneDrive/Documents/Personal projects/Onboarding Platform/onboarding-platform/node_modules/postcss/lib/lazy-result.js:293:11)]
+    [at async transform (turbopack:///[turbopack-node]/transforms/postcss.ts:70:34)]
+    [at async run (turbopack:///[turbopack-node]/ipc/evaluate.ts:92:23)]
+
+Import trace:
+  Client Component Browser:
+    ./OneDrive/Documents/Personal projects/Onboarding Platform/onboarding-platform/app/globals.css [Client Component Browser]
+    ./OneDrive/Documents/Personal projects/Onboarding Platform/onboarding-platform/app/layout.tsx [Server Component]
+
+
+ GET /login 500 in 2.4s (compile: 1316ms, proxy.ts: 683ms, render: 369ms)
+ GET /dashboard 500 in 2.8s (compile: 1729ms, proxy.ts: 994ms, render: 50ms)
+✓ Compiled in 1448ms
+ GET /login 200 in 1691ms (compile: 615ms, proxy.ts: 216ms, render: 860ms)
+ GET /dashboard 200 in 3.6s (compile: 175ms, proxy.ts: 1260ms, render: 2.1s)
+ GET /login 200 in 89ms (compile: 9ms, proxy.ts: 10ms, render: 70ms)
+ GET / 307 in 797ms (compile: 152ms, proxy.ts: 328ms, render: 317ms)
+ GET / 307 in 704ms (compile: 23ms, proxy.ts: 313ms, render: 368ms)
+ GET /login 200 in 701ms (compile: 179ms, proxy.ts: 312ms, render: 210ms)
+ GET /login 200 in 609ms (compile: 21ms, proxy.ts: 255ms, render: 333ms)
+ GET /dashboard 200 in 1119ms (compile: 23ms, proxy.ts: 231ms, render: 865ms)
+ POST /login 303 in 1991ms (compile: 17ms, proxy.ts: 357ms, render: 1617ms)
+✓ Compiled in 639ms
+✓ Compiled in 190ms
+✓ Compiled in 302ms
+ GET /login 200 in 548ms (compile: 226ms, proxy.ts: 31ms, render: 290ms)
+ GET /login 200 in 1120ms (compile: 613ms, proxy.ts: 11ms, render: 496ms)
+ GET /login 200 in 375ms (compile: 183ms, proxy.ts: 14ms, render: 178ms)
+ GET /dashboard 200 in 1159ms (compile: 262ms, proxy.ts: 22ms, render: 875ms)
+ GET /dashboard 200 in 577ms (compile: 51ms, proxy.ts: 17ms, render: 509ms)
+✓ Compiled in 549ms
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+✓ Compiled in 1904ms
+ GET /login 200 in 3.8s (compile: 1206ms, proxy.ts: 430ms, render: 2.2s)
+✓ Compiled in 141ms
+ GET /login 200 in 234ms (compile: 146ms, proxy.ts: 14ms, render: 74ms)
+✓ Compiled in 220ms
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /login 200 in 768ms (compile: 244ms, proxy.ts: 24ms, render: 500ms)
+ GET /login 200 in 236ms (compile: 19ms, proxy.ts: 19ms, render: 198ms)
+✓ Compiled in 58ms
+ GET /dashboard 200 in 1835ms (compile: 89ms, proxy.ts: 257ms, render: 1489ms)
+ POST /login 303 in 3.6s (compile: 414ms, proxy.ts: 124ms, render: 3.0s)
