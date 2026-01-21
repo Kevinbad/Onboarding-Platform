@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { createInvite, deleteInvite } from './actions'
+import { CreateInviteForm } from './create-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -52,35 +53,7 @@ export default async function AdminPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <form action={createInvite} className="space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Email Address</label>
-                                    <div className="relative">
-                                        <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
-                                        <Input
-                                            name="email"
-                                            placeholder="worker@example.com"
-                                            required
-                                            className="pl-9 bg-[#0f1225] border-slate-700"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Monthly Salary (USD)</label>
-                                    <div className="relative">
-                                        <DollarSign className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
-                                        <Input
-                                            name="salary"
-                                            placeholder="2000"
-                                            required
-                                            className="pl-9 bg-[#0f1225] border-slate-700"
-                                        />
-                                    </div>
-                                </div>
-                                <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white">
-                                    Send Invite
-                                </Button>
-                            </form>
+                            <CreateInviteForm />
                         </CardContent>
                     </Card>
 
