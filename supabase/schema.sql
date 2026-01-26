@@ -56,9 +56,45 @@ alter table user_invites enable row level security;
 
 -- Only admins can manage invites
 create policy "Admins can manage invites" on user_invites
-  for all using (
     is_admin()
   );
+
+-- Function to claim invite (Auto-healing)
+create or replace function public.claim_invite()
+returns boolean as $$
+declare
+  invite_record record;
+  user_email text;
+  user_id uuid;
+begin
+  user_id := auth.uid();
+  select email into user_email from auth.users where id = user_id;
+  
+  if user_email is null then return false; end if;
+
+  select * into invite_record from public.user_invites where lower(email) = lower(user_email);
+
+  if invite_record is null then return false; end if;
+
+  insert into public.profiles (id, full_name, role, salary, onboarding_status)
+  values (
+    user_id,
+    (select raw_user_meta_data->>'full_name' from auth.users where id = user_id),
+    coalesce(invite_record.role, 'user'),
+    invite_record.salary,
+    'started'
+  )
+  on conflict (id) do update
+  set 
+    role = excluded.role,
+    salary = excluded.salary,
+    onboarding_status = coalesce(profiles.onboarding_status, 'started');
+
+  delete from public.user_invites where email = invite_record.email;
+
+  return true;
+end;
+$$ language plpgsql security definer;
 
 -- Function to handle new user signup
 create or replace function public.handle_new_user()
