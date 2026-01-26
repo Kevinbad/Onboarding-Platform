@@ -138,6 +138,40 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
         }
     }
 
+    // BLOCKING: If no salary is assigned, do not show contract
+    if (!initialData?.salary || initialData.salary === '0' || initialData.salary === '') {
+        return (
+            <Card className="shadow-lg border-yellow-500/50">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-yellow-500">
+                        <FileText className="h-5 w-5" />
+                        Contract Preparation Pending
+                    </CardTitle>
+                    <CardDescription>
+                        Your employment contract is currently being generated.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="p-4 bg-yellow-500/10 rounded-lg border border-yellow-500/20 text-yellow-200">
+                        <p className="font-medium">Salary Configuration Required</p>
+                        <p className="text-sm mt-1 opacity-90">
+                            Your administrator has not assigned a salary to your profile yet.
+                            Please contact your hiring manager or administrator to finalize your offer details.
+                        </p>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                        Once your salary is configured, you will be able to review and sign your contract here.
+                    </p>
+                </CardContent>
+                <CardFooter>
+                    <Button variant="outline" onClick={onBack}>
+                        Back
+                    </Button>
+                </CardFooter>
+            </Card>
+        )
+    }
+
     return (
         <Card className="shadow-lg">
             <CardHeader>
