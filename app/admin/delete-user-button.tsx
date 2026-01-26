@@ -56,7 +56,7 @@ export function DeleteUserButton({ userId, userEmail }: { userId: string, userEm
                 <AlertDialogFooter>
                     <AlertDialogCancel className="bg-transparent border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white">Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                        onClick={(e) => {
+                        onClick={(e: React.MouseEvent) => {
                             e.preventDefault()
                             handleDelete()
                         }}
