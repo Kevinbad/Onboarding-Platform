@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Trash2, UserPlus, DollarSign, Mail, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminPage() {
     // Auth checks handled by layout
     const supabase = await createClient()
