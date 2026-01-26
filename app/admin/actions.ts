@@ -81,7 +81,7 @@ export async function deleteInvite(email: string) {
 export async function deleteUser(userId: string) {
     const supabase = await createClient()
 
-    // Check admin
+    // Check admin using regular client
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Unauthorized' }
 
@@ -93,8 +93,12 @@ export async function deleteUser(userId: string) {
 
     if (profile?.role !== 'admin') return { error: 'Unauthorized' }
 
+    // Use admin client to bypass RLS for deletion
+    const { createAdminClient } = await import('@/lib/supabase/admin')
+    const adminSupabase = createAdminClient()
+
     try {
-        const { error } = await supabase
+        const { error } = await adminSupabase
             .from('profiles')
             .delete()
             .eq('id', userId)
