@@ -64,7 +64,7 @@ export default async function Dashboard() {
             }
         }
 
-        return <AccessDenied email={user?.email} />
+        return <AccessDenied email={user?.email} profile={profile} />
     }
 
     return (
