@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { createInvite, deleteInvite, deleteUser } from './actions'
 import { CreateInviteForm } from './create-form'
+import { DeleteUserButton } from './delete-user-button'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -132,14 +133,7 @@ export default async function AdminPage() {
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <form action={async () => {
-                                                        'use server'
-                                                        await deleteUser(employee.id)
-                                                    }}>
-                                                        <Button variant="ghost" size="sm" className="text-slate-400 hover:text-red-400">
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </form>
+                                                    <DeleteUserButton userId={employee.id} userEmail={employee.email} />
                                                 </td>
                                             </tr>
                                         ))}
