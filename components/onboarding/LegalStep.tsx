@@ -19,42 +19,24 @@ interface LegalStepProps {
 export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
     const [loading, setLoading] = useState(false)
     const [accepted, setAccepted] = useState(Boolean(initialData?.contract_signed) || false)
-    const sigCanvas = useRef<SignatureCanvas>(null)
+    const [signatureText, setSignatureText] = useState('')
+    const [agreed, setAgreed] = useState(false)
+
+    // Validate form state
+    useEffect(() => {
+        if (agreed && signatureText.trim().length > 2) {
+            setAccepted(true)
+        } else {
+            setAccepted(false)
+        }
+    }, [agreed, signatureText])
+
     const containerRef = useRef<HTMLDivElement>(null)
-    const canvasContainerRef = useRef<HTMLDivElement>(null)
-    const [canvasWidth, setCanvasWidth] = useState(500)
     const supabase = createClient()
 
-    useEffect(() => {
-        const updateWidth = () => {
-            if (canvasContainerRef.current) {
-                const width = canvasContainerRef.current.offsetWidth
-                setCanvasWidth(width)
-            }
-        }
-
-        // Initial update
-        updateWidth()
-
-        // Debounce resize slightly or just listen
-        window.addEventListener('resize', updateWidth)
-        return () => window.removeEventListener('resize', updateWidth)
-    }, [])
-
-    const clearSignature = () => {
-        sigCanvas.current?.clear()
-        setAccepted(false)
-    }
-
-    const onEndSignature = () => {
-        if (!sigCanvas.current?.isEmpty()) {
-            setAccepted(true)
-        }
-    }
-
     async function handleSubmit() {
-        if (!accepted || (sigCanvas.current?.isEmpty() && !initialData?.contract_signed)) {
-            toast.error('Please sign the agreement to proceed.')
+        if (!accepted) {
+            toast.error('Please accept the agreement and sign with your full name.')
             return
         }
 
@@ -82,28 +64,22 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
                         clonedElement.style.borderColor = '#e2e8f0'
                     }
 
-                    // Inject Signature and Date inline
-                    if (sigCanvas.current && !sigCanvas.current.isEmpty()) {
-                        const sigData = sigCanvas.current.getTrimmedCanvas().toDataURL('image/png')
+                    // Inject Signature Text and Date inline
+                    const sigPlaceholder = clonedDoc.getElementById('contract-signature-placeholder')
+                    if (sigPlaceholder) {
+                        // Replace placeholder with text signature
+                        sigPlaceholder.innerText = signatureText
+                        // Style it to look like a signature
+                        sigPlaceholder.style.fontFamily = '"Brush Script MT", "Zapfino", "Segoe Script", cursive'
+                        sigPlaceholder.style.fontSize = '24px'
+                        sigPlaceholder.style.fontStyle = 'italic'
+                        sigPlaceholder.style.borderBottom = 'none'
+                        sigPlaceholder.style.padding = '0 10px'
+                    }
 
-                        const sigPlaceholder = clonedDoc.getElementById('contract-signature-placeholder')
-                        if (sigPlaceholder) {
-                            // Create an image element for the signature
-                            const img = clonedDoc.createElement('img')
-                            img.src = sigData
-                            img.style.maxHeight = '50px' // Limit height to fit
-                            img.style.display = 'inline-block'
-                            img.style.borderBottom = '1px solid black'
-
-                            // Clear placeholder and append image
-                            sigPlaceholder.innerHTML = ''
-                            sigPlaceholder.appendChild(img)
-                        }
-
-                        const datePlaceholder = clonedDoc.getElementById('contract-date-placeholder')
-                        if (datePlaceholder) {
-                            datePlaceholder.innerText = new Date().toLocaleDateString()
-                        }
+                    const datePlaceholder = clonedDoc.getElementById('contract-date-placeholder')
+                    if (datePlaceholder) {
+                        datePlaceholder.innerText = new Date().toLocaleDateString()
                     }
                 }
             })
@@ -121,9 +97,6 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
 
             pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
 
-            // NO manuall signature append here anymore, it is embedded above
-
-
             const pdfBlob = pdf.output('blob')
 
             // Upload to Supabase Storage
@@ -137,7 +110,7 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
 
             if (uploadError) throw uploadError
 
-            // Get Public URL (or signed URL depending on policy, assuming public read for now or we store path)
+            // Get Public URL
             const { data: { publicUrl } } = supabase.storage
                 .from('contracts')
                 .getPublicUrl(fileName)
@@ -174,7 +147,7 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div id="legal-contract-content" ref={containerRef} className="border border-border rounded-md p-8 bg-white text-black h-96 overflow-y-auto font-serif text-sm leading-relaxed shadow-inner">
+                <div id="legal-contract-content" ref={containerRef} className="border border-border rounded-md p-8 bg-white text-black h-96 overflow-y-auto font-serif text-sm leading-relaxed shadow-inner mb-6">
                     <div className="text-center mb-6">
                         <h2 className="font-bold text-lg uppercase underline mb-2">Independent Contractor Service Agreement</h2>
                         <p className="font-bold">Solvenza Solutions LLC</p>
@@ -289,40 +262,47 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
                     </div>
                 </div>
 
-                <div className="mt-6">
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                        Sign Here
-                    </label>
-                    <div ref={canvasContainerRef} className="border border-input rounded-md bg-white dark:bg-slate-50 overflow-hidden relative">
-                        <SignatureCanvas
-                            ref={sigCanvas}
-                            penColor="black"
-                            canvasProps={{
-                                width: canvasWidth,
-                                height: 200,
-                                className: 'sigCanvas w-full h-48 cursor-crosshair'
-                            }}
-                            onEnd={onEndSignature}
-                        />
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-2 right-2 text-slate-400 hover:text-red-500"
-                            onClick={clearSignature}
-                            title="Clear Signature"
-                        >
-                            <Eraser className="h-4 w-4" />
-                        </Button>
+                <div className="mt-8 space-y-6 max-w-lg mx-auto bg-slate-50 dark:bg-slate-900/50 p-6 rounded-lg border border-slate-200 dark:border-slate-800">
+                    <div className="flex items-start space-x-3">
+                        <div className="flex items-center h-5">
+                            <input
+                                id="terms"
+                                type="checkbox"
+                                checked={agreed}
+                                onChange={(e) => setAgreed(e.target.checked)}
+                                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600 cursor-pointer"
+                            />
+                        </div>
+                        <div className="text-sm">
+                            <label htmlFor="terms" className="font-medium text-foreground cursor-pointer select-none">
+                                I agree to the terms and conditions used in this Service Agreement.
+                            </label>
+                            <p className="text-muted-foreground mt-1 text-xs">
+                                By checking this box, you acknowledge that you have read, understood, and accept the legal agreement key terms above.
+                            </p>
+                        </div>
                     </div>
-                    {!accepted && (
+
+                    <div>
+                        <label htmlFor="signature" className="block text-sm font-medium text-foreground mb-2">
+                            Digital Signature (Type Full Name)
+                        </label>
+                        <input
+                            id="signature"
+                            type="text"
+                            value={signatureText}
+                            onChange={(e) => setSignatureText(e.target.value)}
+                            placeholder="e.g. John Doe"
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        />
                         <p className="text-xs text-muted-foreground mt-2">
-                            Please sign in the box above to accept the agreement.
+                            Entering your full name here constitutes your electronic signature and intent to be bound by this agreement.
                         </p>
-                    )}
+                    </div>
                 </div>
+
             </CardContent>
-            <CardFooter className="flex justify-between pt-0">
+            <CardFooter className="flex justify-between pt-0 mt-4">
                 <Button
                     type="button"
                     variant="outline"
@@ -332,10 +312,10 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
                 </Button>
                 <Button
                     onClick={handleSubmit}
-                    disabled={!accepted}
-                    isLoading={loading}
+                    disabled={!accepted || loading}
+                    className="bg-blue-600 hover:bg-blue-700 text-white min-w-[200px]"
                 >
-                    Sign & Complete
+                    {loading ? 'Processing...' : 'Sign Agreement & Complete'}
                 </Button>
             </CardFooter>
         </Card>
