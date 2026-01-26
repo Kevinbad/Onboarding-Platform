@@ -14,6 +14,7 @@ import { Briefcase } from 'lucide-react'
 
 const profileSchema = z.object({
     full_name: z.string().min(2, "Full name is required"),
+    date_of_birth: z.string().min(1, "Date of birth is required"),
     government_id: z.string().min(4, "ID is required"),
     country: z.string().min(2, "Country is required"),
     phone: z.string().min(6, "Phone number is required"),
@@ -61,6 +62,7 @@ export function ProfileStep({ initialData, onComplete }: ProfileStepProps) {
 
     const defaultValues: Partial<ProfileFormValues> = {
         full_name: initialData?.full_name || '',
+        date_of_birth: initialData?.date_of_birth || '',
         government_id: initialData?.government_id || '',
         country: initialData?.country || '',
         phone: initialData?.phone || '',
@@ -114,6 +116,15 @@ export function ProfileStep({ initialData, onComplete }: ProfileStepProps) {
                                 {...form.register('full_name')}
                                 type="text"
                                 error={form.formState.errors.full_name?.message}
+                            />
+                        </div>
+
+                        <div className="sm:col-span-2">
+                            <label htmlFor="date_of_birth" className="block text-sm font-medium text-foreground mb-1">Date of Birth</label>
+                            <Input
+                                {...form.register('date_of_birth')}
+                                type="date"
+                                error={form.formState.errors.date_of_birth?.message}
                             />
                         </div>
 
