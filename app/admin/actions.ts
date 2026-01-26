@@ -77,3 +77,33 @@ export async function deleteInvite(email: string) {
         return { error: 'Error deleting invite: ' + (error as Error).message }
     }
 }
+
+export async function deleteUser(userId: string) {
+    const supabase = await createClient()
+
+    // Check admin
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Unauthorized' }
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+    if (profile?.role !== 'admin') return { error: 'Unauthorized' }
+
+    try {
+        const { error } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', userId)
+
+        if (error) throw error
+
+        revalidatePath('/admin')
+        return { success: true }
+    } catch (error: unknown) {
+        return { error: 'Error deleting user: ' + (error as Error).message }
+    }
+}

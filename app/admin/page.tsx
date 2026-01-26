@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { createInvite, deleteInvite } from './actions'
+import { createInvite, deleteInvite, deleteUser } from './actions'
 import { CreateInviteForm } from './create-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,20 +9,8 @@ import { Trash2, UserPlus, DollarSign, Mail, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default async function AdminPage() {
+    // Auth checks handled by layout
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) return redirect('/login')
-
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
-    if (profile?.role !== 'admin') {
-        return redirect('/dashboard')
-    }
 
     const { data: invites } = await supabase
         .from('user_invites')
@@ -110,11 +98,12 @@ export default async function AdminPage() {
                                             <th className="px-6 py-3">Salary</th>
                                             <th className="px-6 py-3">Status</th>
                                             <th className="px-6 py-3 text-right">Contract</th>
+                                            <th className="px-6 py-3 text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-800">
                                         {/* Get profiles for table */}
-                                        {(await supabase.from('profiles').select('*').neq('role', 'admin').order('created_at', { ascending: false })).data?.map((employee) => (
+                                        {(await supabase.from('profiles').select('*').neq('role', 'admin').order('created_at', { ascending: false })).data?.map((employee: any) => (
                                             <tr key={employee.id} className="hover:bg-slate-800/10">
                                                 <td className="px-6 py-4 font-medium text-white">
                                                     <div>{employee.full_name || 'No Name'}</div>
@@ -142,11 +131,21 @@ export default async function AdminPage() {
                                                         <span className="text-slate-600 italic">Not signed</span>
                                                     )}
                                                 </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <form action={async () => {
+                                                        'use server'
+                                                        await deleteUser(employee.id)
+                                                    }}>
+                                                        <Button variant="ghost" size="sm" className="text-slate-400 hover:text-red-400">
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </form>
+                                                </td>
                                             </tr>
                                         ))}
                                         {(!((await supabase.from('profiles').select('id').neq('role', 'admin')).data?.length)) && (
                                             <tr>
-                                                <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                                                <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
                                                     No registered employees yet.
                                                 </td>
                                             </tr>

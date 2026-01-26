@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { FileText, Eraser } from 'lucide-react'
@@ -21,7 +21,25 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
     const [accepted, setAccepted] = useState(Boolean(initialData?.contract_signed) || false)
     const sigCanvas = useRef<SignatureCanvas>(null)
     const containerRef = useRef<HTMLDivElement>(null)
+    const canvasContainerRef = useRef<HTMLDivElement>(null)
+    const [canvasWidth, setCanvasWidth] = useState(500)
     const supabase = createClient()
+
+    useEffect(() => {
+        const updateWidth = () => {
+            if (canvasContainerRef.current) {
+                const width = canvasContainerRef.current.offsetWidth
+                setCanvasWidth(width)
+            }
+        }
+
+        // Initial update
+        updateWidth()
+
+        // Debounce resize slightly or just listen
+        window.addEventListener('resize', updateWidth)
+        return () => window.removeEventListener('resize', updateWidth)
+    }, [])
 
     const clearSignature = () => {
         sigCanvas.current?.clear()
@@ -275,12 +293,12 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
                     <label className="block text-sm font-medium text-foreground mb-2">
                         Sign Here
                     </label>
-                    <div className="border border-input rounded-md bg-white dark:bg-slate-50 overflow-hidden relative">
+                    <div ref={canvasContainerRef} className="border border-input rounded-md bg-white dark:bg-slate-50 overflow-hidden relative">
                         <SignatureCanvas
                             ref={sigCanvas}
                             penColor="black"
                             canvasProps={{
-                                width: 500,
+                                width: canvasWidth,
                                 height: 200,
                                 className: 'sigCanvas w-full h-48 cursor-crosshair'
                             }}
