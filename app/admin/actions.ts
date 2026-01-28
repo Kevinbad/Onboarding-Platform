@@ -79,11 +79,18 @@ export async function deleteInvite(email: string) {
 }
 
 export async function deleteUser(userId: string) {
+    console.log('[deleteUser] Starting delete for userId:', userId)
+
     const supabase = await createClient()
 
     // Check admin using regular client
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return { error: 'Unauthorized' }
+    console.log('[deleteUser] Current user:', user?.id)
+
+    if (!user) {
+        console.log('[deleteUser] No user found - Unauthorized')
+        return { error: 'Unauthorized' }
+    }
 
     const { data: profile } = await supabase
         .from('profiles')
@@ -91,23 +98,35 @@ export async function deleteUser(userId: string) {
         .eq('id', user.id)
         .single()
 
-    if (profile?.role !== 'admin') return { error: 'Unauthorized' }
+    console.log('[deleteUser] Current user role:', profile?.role)
+
+    if (profile?.role !== 'admin') {
+        console.log('[deleteUser] Not admin - Unauthorized')
+        return { error: 'Unauthorized' }
+    }
 
     // Use admin client to bypass RLS for deletion
+    console.log('[deleteUser] Creating admin client...')
     const { createAdminClient } = await import('@/lib/supabase/admin')
     const adminSupabase = createAdminClient()
+    console.log('[deleteUser] Admin client created')
 
     try {
-        const { error } = await adminSupabase
+        console.log('[deleteUser] Executing delete...')
+        const { error, count } = await adminSupabase
             .from('profiles')
             .delete()
             .eq('id', userId)
 
+        console.log('[deleteUser] Delete result - error:', error, 'count:', count)
+
         if (error) throw error
 
         revalidatePath('/admin')
+        console.log('[deleteUser] Success!')
         return { success: true }
     } catch (error: unknown) {
+        console.error('[deleteUser] Error:', error)
         return { error: 'Error deleting user: ' + (error as Error).message }
     }
 }

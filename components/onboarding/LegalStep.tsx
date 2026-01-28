@@ -20,6 +20,37 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
     const [accepted, setAccepted] = useState(Boolean(initialData?.contract_signed) || false)
     const [signatureText, setSignatureText] = useState('')
     const [agreed, setAgreed] = useState(false)
+    // Fresh profile data loaded from DB to ensure salary is available
+    const [profileData, setProfileData] = useState<Record<string, string | boolean> | undefined>(initialData)
+    const [loadingProfile, setLoadingProfile] = useState(true)
+
+    const containerRef = useRef<HTMLDivElement>(null)
+    const supabase = createClient()
+
+    // Reload profile from DB to get fresh salary data
+    useEffect(() => {
+        async function loadProfile() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser()
+                if (user) {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', user.id)
+                        .single()
+
+                    if (profile) {
+                        setProfileData(profile as Record<string, string | boolean>)
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error)
+            } finally {
+                setLoadingProfile(false)
+            }
+        }
+        loadProfile()
+    }, [supabase])
 
     // Validate form state
     useEffect(() => {
@@ -29,9 +60,6 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
             setAccepted(false)
         }
     }, [agreed, signatureText])
-
-    const containerRef = useRef<HTMLDivElement>(null)
-    const supabase = createClient()
 
     async function handleSubmit() {
         if (!accepted) {
@@ -137,8 +165,24 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
         }
     }
 
+    // Show loading while fetching fresh profile data
+    if (loadingProfile) {
+        return (
+            <Card className="shadow-lg">
+                <CardContent className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <p className="text-muted-foreground">Loading contract data...</p>
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
+
     // BLOCKING: If no salary is assigned, do not show contract
-    if (!initialData?.salary || initialData.salary === '0' || initialData.salary === '') {
+    // Use profileData (fresh from DB) instead of initialData
+    const salary = profileData?.salary
+    if (!salary || salary === '0' || salary === '') {
         return (
             <Card className="shadow-lg border-yellow-500/50">
                 <CardHeader>
@@ -190,7 +234,7 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
 
                     <p className="mb-4"><strong>BETWEEN:</strong></p>
                     <p className="mb-4 text-justify">
-                        <strong>Solvenza Solutions LLC</strong>, a Wyoming limited liability company, with principal place of business at 30 N Gould St Ste N, Sheridan, WY 82801, United States, represented by Laura Lechuga (hereinafter, &quot;THE COMPANY&quot;), and <strong className="uppercase">{initialData?.full_name || '________________________'}</strong>, of legal age, identified with ID No. <strong>{initialData?.government_id || '________________________'}</strong>, residing in <strong>{initialData?.country || '________________________'}</strong>, acting in his/her own name and as an independent contractor (hereinafter, &quot;THE CONTRACTOR&quot;), the parties agree as follows:
+                        <strong>Solvenza Solutions LLC</strong>, a Wyoming limited liability company, with principal place of business at 30 N Gould St Ste N, Sheridan, WY 82801, United States, represented by Laura Lechuga (hereinafter, &quot;THE COMPANY&quot;), and <strong className="uppercase">{profileData?.full_name || '________________________'}</strong>, of legal age, identified with ID No. <strong>{profileData?.government_id || '________________________'}</strong>, residing in <strong>{profileData?.country || '________________________'}</strong>, acting in his/her own name and as an independent contractor (hereinafter, &quot;THE CONTRACTOR&quot;), the parties agree as follows:
                     </p>
 
                     <p className="mb-2"><strong>1. SERVICES</strong></p>
@@ -224,7 +268,7 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
 
                     <p className="mb-2"><strong>5. FEES AND PAYMENT</strong></p>
                     <p className="mb-2 text-justify">
-                        5.1 THE COMPANY shall pay THE CONTRACTOR <strong>USD {initialData?.salary ? Number(initialData.salary).toFixed(2) : '_____'}</strong> per month, in two equal installments of <strong>USD {initialData?.salary ? (Number(initialData.salary) / 2).toFixed(2) : '_____'}</strong> each, payable bi-weekly.
+                        5.1 THE COMPANY shall pay THE CONTRACTOR <strong>USD {profileData?.salary ? Number(profileData.salary).toFixed(2) : '_____'}</strong> per month, in two equal installments of <strong>USD {profileData?.salary ? (Number(profileData.salary) / 2).toFixed(2) : '_____'}</strong> each, payable bi-weekly.
                     </p>
                     <p className="mb-4 text-justify">
                         5.2 Payments will be made by electronic funds transfer, upon receipt of a valid electronic invoice or equivalent legal document.
@@ -287,7 +331,7 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
                             </div>
                             <div>
                                 <p className="font-bold">FOR THE CONTRACTOR</p>
-                                <p className="mb-8">Name: {initialData?.full_name || '________________________'}</p>
+                                <p className="mb-8">Name: {profileData?.full_name || '________________________'}</p>
                                 <p>Signature: <span id="contract-signature-placeholder">__________________________</span></p>
                                 <p>Date: <span id="contract-date-placeholder">________________________________</span></p>
                             </div>
