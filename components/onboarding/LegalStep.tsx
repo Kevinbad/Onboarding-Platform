@@ -199,16 +199,44 @@ export function LegalStep({ initialData, onComplete, onBack }: LegalStepProps) {
                         <p className="font-medium">Salary Configuration Required</p>
                         <p className="text-sm mt-1 opacity-90">
                             Your administrator has not assigned a salary to your profile yet.
-                            Please contact your hiring manager or administrator to finalize your offer details.
+                            Please check back shortly or contact your hiring manager to finalize your offer details.
                         </p>
                     </div>
                     <p className="text-sm text-muted-foreground">
                         Once your salary is configured, you will be able to review and sign your contract here.
                     </p>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex justify-between">
                     <Button variant="outline" onClick={onBack}>
                         Back
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setLoadingProfile(true)
+                            // Re-trigger the useEffect
+                            const loadProfile = async () => {
+                                try {
+                                    const { data: { user } } = await supabase.auth.getUser()
+                                    if (user) {
+                                        const { data: profile } = await supabase
+                                            .from('profiles')
+                                            .select('*')
+                                            .eq('id', user.id)
+                                            .single()
+                                        if (profile) setProfileData(profile as Record<string, string | boolean>)
+                                    }
+                                } catch (error) {
+                                    console.error(error)
+                                } finally {
+                                    setLoadingProfile(false)
+                                }
+                            }
+                            loadProfile()
+                        }}
+                        disabled={loadingProfile}
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                    >
+                        Check for Updates
                     </Button>
                 </CardFooter>
             </Card>

@@ -12,6 +12,7 @@ envContent.split('\n').forEach(line => {
 });
 
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
+// Use service role key if available, otherwise anon key (but service key needed for auth.admin)
 const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const isServiceKey = !!env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -25,36 +26,62 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 async function main() {
-    const email = 'lauesinsoa99@gmail.com';
+    const email = 'lauespinosa99@gmail.com';
     console.log(`CHECKING USER: ${email}`);
     console.log(`Using Service Key: ${isServiceKey}`);
 
-    const { data: invites, error: inviteError } = await supabase
-        .from('user_invites')
-        .select('*')
-        .eq('email', email);
-
-    if (inviteError) console.log('Invite Error:', inviteError.message);
-    else console.log('INVITES FOUND:', invites.length);
-    if (invites && invites.length > 0) console.log(JSON.stringify(invites, null, 2));
-
-    const { data: profiles, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('email', email);
-
-    if (profileError) console.log('Profile Error:', profileError.message);
-    else console.log('PROFILES FOUND:', profiles.length);
-    if (profiles && profiles.length > 0) console.log(JSON.stringify(profiles, null, 2));
-
-    if (isServiceKey) {
-        const { data, error } = await supabase.auth.admin.listUsers();
-        if (error) console.log('Auth Error:', error.message);
-        else {
-            const user = data.users.find(u => u.email === email);
-            console.log('AUTH USER FOUND:', !!user);
-            if (user) console.log('User ID:', user.id);
+    // 1. Check Invites (Admin table, needs RLS bypass or Service Key)
+    const { data: allInvites, error: inviteError } = await supabase.from('user_invites').select('*');
+    if (inviteError) {
+        console.error('Error fetching invites:', inviteError.message);
+    } else {
+        console.log(`TOTAL INVITES: ${allInvites.length}`);
+        const exactMatch = allInvites.find(i => i.email.toLowerCase() === email.toLowerCase());
+        if (exactMatch) {
+            console.log('EXACT INVITE FOUND:', exactMatch);
+        } else {
+            console.log('NO EXACT INVITE FOUND.');
+            // Check for potential typos/partial matches
+            const partial = allInvites.find(i => i.email.toLowerCase().includes('lau'));
+            if (partial) console.log('Partial Match Found:', partial);
         }
+    }
+
+    // 2. Check Auth User and Profile (Needs Service Key for Auth)
+    if (isServiceKey) {
+        const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+        if (authError) {
+            console.error('Auth Error:', authError.message);
+        } else {
+            // Filter locally because listUsers doesn't support filtering by email in all versions/wrappers cleanly here
+            const user = authData.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+            if (user) {
+                console.log('AUTH USER FOUND. ID:', user.id);
+
+                // 3. Fetch Profile by ID
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                if (profileError) {
+                    console.error('Profile Fetch Error:', profileError.message);
+                } else {
+                    console.log('PROFILE FOUND:');
+                    console.log(JSON.stringify(profile, null, 2));
+                    console.log('SALARY FIELD CHECK:');
+                    console.log(`Value: "${profile.salary}"`);
+                    console.log(`Type: ${typeof profile.salary}`);
+                    console.log(`Length: ${profile.salary ? profile.salary.length : 'N/A'}`);
+                }
+            } else {
+                console.log('AUTH USER NOT FOUND for this email.');
+            }
+        }
+    } else {
+        console.log('Skipping Auth/Profile check - requires SUPABASE_SERVICE_ROLE_KEY in .env.local');
     }
 }
 
