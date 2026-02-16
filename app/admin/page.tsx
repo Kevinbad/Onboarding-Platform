@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createInvite, deleteInvite, deleteUser } from './actions'
 import { CreateInviteForm } from './create-form'
 import { DeleteUserButton } from './delete-user-button'
+import { ResetPasswordButton } from './reset-password-button'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -148,7 +149,10 @@ export default async function AdminPage() {
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <DeleteUserButton userId={employee.id} userEmail={employee.email} />
+                                                    <div className="flex justify-end gap-2">
+                                                        <ResetPasswordButton userId={employee.id} userEmail={employee.email} />
+                                                        <DeleteUserButton userId={employee.id} userEmail={employee.email} />
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}

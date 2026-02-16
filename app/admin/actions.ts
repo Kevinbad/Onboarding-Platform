@@ -243,3 +243,35 @@ export async function syncPendingInvites() {
         return { error: 'Error syncing invites: ' + (error as Error).message }
     }
 }
+
+export async function updateUserPassword(userId: string, newPassword: string) {
+    const supabase = await createClient()
+
+    // Check admin
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Unauthorized' }
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+    if (profile?.role !== 'admin') return { error: 'Unauthorized' }
+
+    const { createAdminClient } = await import('@/lib/supabase/admin')
+    const adminSupabase = createAdminClient()
+
+    try {
+        const { error } = await adminSupabase.auth.admin.updateUserById(
+            userId,
+            { password: newPassword }
+        )
+
+        if (error) throw error
+
+        return { success: true }
+    } catch (error: unknown) {
+        return { error: 'Error updating password: ' + (error as Error).message }
+    }
+}
