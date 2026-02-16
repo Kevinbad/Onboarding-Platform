@@ -51,10 +51,23 @@ export default async function AdminPage() {
                     {/* Invite List */}
                     <Card className="bg-[#1a1f36] border-slate-800 h-fit">
                         <CardHeader>
-                            <CardTitle>Active Invites</CardTitle>
-                            <CardDescription>
-                                Users waiting to register ({invites?.length || 0})
-                            </CardDescription>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <CardTitle>Active Invites</CardTitle>
+                                    <CardDescription>
+                                        Users waiting to register ({invites?.length || 0})
+                                    </CardDescription>
+                                </div>
+                                <form action={async () => {
+                                    'use server'
+                                    const { syncPendingInvites } = await import('./actions')
+                                    await syncPendingInvites()
+                                }}>
+                                    <Button size="sm" variant="outline" className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10">
+                                        Sync Pending
+                                    </Button>
+                                </form>
+                            </div>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">

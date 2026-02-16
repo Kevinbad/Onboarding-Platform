@@ -179,3 +179,65 @@ export async function deleteUser(userId: string) {
         return { error: 'Error deleting user: ' + (error as Error).message }
     }
 }
+
+export async function syncPendingInvites() {
+    const supabase = await createClient()
+
+    // Check admin
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Unauthorized' }
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+    if (profile?.role !== 'admin') return { error: 'Unauthorized' }
+
+    const { createAdminClient } = await import('@/lib/supabase/admin')
+    const adminSupabase = createAdminClient()
+
+    try {
+        // 1. Get all pending invites
+        const { data: invites, error: inviteError } = await adminSupabase
+            .from('user_invites')
+            .select('*')
+
+        if (inviteError) throw inviteError
+        if (!invites || invites.length === 0) return { success: true, count: 0 }
+
+        // 2. Get all users
+        const { data: { users }, error: userError } = await adminSupabase.auth.admin.listUsers({ perPage: 1000 })
+        if (userError) throw userError
+
+        let fixedCount = 0
+
+        for (const invite of invites) {
+            // Find matching user by email
+            const targetUser = users.find(u => u.email?.toLowerCase() === invite.email.toLowerCase())
+
+            if (targetUser) {
+                // Update profile
+                const { error: updateError } = await adminSupabase
+                    .from('profiles')
+                    .update({
+                        salary: invite.salary,
+                        role: invite.role || 'user'
+                    })
+                    .eq('id', targetUser.id)
+
+                if (!updateError) {
+                    fixedCount++
+                    // Consume invite
+                    await adminSupabase.from('user_invites').delete().eq('email', invite.email)
+                }
+            }
+        }
+
+        revalidatePath('/admin')
+        return { success: true, count: fixedCount }
+    } catch (error: unknown) {
+        return { error: 'Error syncing invites: ' + (error as Error).message }
+    }
+}
