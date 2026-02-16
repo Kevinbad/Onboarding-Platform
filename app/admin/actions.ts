@@ -236,6 +236,8 @@ export async function syncPendingInvites() {
         }
 
         revalidatePath('/admin')
+        revalidatePath('/dashboard')
+        revalidatePath('/', 'layout')
         return { success: true, count: fixedCount }
     } catch (error: unknown) {
         return { error: 'Error syncing invites: ' + (error as Error).message }

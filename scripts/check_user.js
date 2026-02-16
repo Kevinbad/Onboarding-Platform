@@ -26,7 +26,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 async function main() {
-    const email = 'lauespinosa99@gmail.com';
+    const email = 'davidmon.17@gmail.com';
     console.log(`CHECKING USER: ${email}`);
     console.log(`Using Service Key: ${isServiceKey}`);
 
@@ -72,7 +72,7 @@ async function main() {
                     console.log('PROFILE FOUND:');
                     console.log(JSON.stringify(profile, null, 2));
                     console.log('SALARY FIELD CHECK:');
-                    console.log(`Value: "${profile.salary}"`);
+                    console.log(`Value: ${JSON.stringify(profile.salary)}`);
                     console.log(`Type: ${typeof profile.salary}`);
                     console.log(`Length: ${profile.salary ? profile.salary.length : 'N/A'}`);
                 }
