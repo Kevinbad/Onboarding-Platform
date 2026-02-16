@@ -4,16 +4,6 @@ import { useState } from 'react'
 import { KeyRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import { toast } from 'sonner'
 import { updateUserPassword } from '@/app/admin/actions'
 
@@ -46,43 +36,62 @@ export function ResetPasswordButton({ userId, userEmail }: { userId: string, use
     }
 
     return (
-        <AlertDialog open={open} onOpenChange={setOpen}>
-            <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-slate-400 hover:text-blue-400 hover:bg-blue-900/10">
-                    <KeyRound className="h-4 w-4" />
-                </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-[#1a1f36] border-slate-800 text-white">
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Reset Password</AlertDialogTitle>
-                    <AlertDialogDescription className="text-slate-400">
-                        Set a new password for <strong>{userEmail}</strong>.<br />
-                        The user can use this password to log in immediately.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
+        <>
+            <Button
+                variant="ghost"
+                size="sm"
+                className="text-slate-400 hover:text-blue-400 hover:bg-blue-900/10"
+                onClick={() => setOpen(true)}
+            >
+                <KeyRound className="h-4 w-4" />
+            </Button>
 
-                <div className="py-4">
-                    <Input
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter new password"
-                        className="bg-[#0f1225] border-slate-700 text-white"
-                    />
+            {open && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="w-full max-w-md bg-[#1a1f36] border border-slate-800 rounded-lg shadow-2xl p-6 animate-in zoom-in-95 duration-200">
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <h3 className="text-lg font-semibold text-white">Reset Password</h3>
+                                <p className="text-sm text-slate-400">
+                                    Set a new password for <strong className="text-white">{userEmail}</strong>.<br />
+                                    The user can use this password to log in immediately.
+                                </p>
+                            </div>
+
+                            <div className="py-2">
+                                <Input
+                                    autoFocus
+                                    type="text"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Enter new password"
+                                    className="bg-[#0f1225] border-slate-700 text-white placeholder:text-slate-600 focus-visible:ring-blue-500"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        setOpen(false)
+                                        setPassword('')
+                                    }}
+                                    className="bg-transparent border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={handleReset}
+                                    disabled={loading}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                >
+                                    {loading ? 'Updating...' : 'Set Password'}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <AlertDialogFooter>
-                    <AlertDialogCancel className="bg-transparent border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white">
-                        Cancel
-                    </AlertDialogCancel>
-                    <Button
-                        onClick={handleReset}
-                        disabled={loading}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                        {loading ? 'Updating...' : 'Set Password'}
-                    </Button>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+            )}
+        </>
     )
 }

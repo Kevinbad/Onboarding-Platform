@@ -26,8 +26,8 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 async function main() {
-    const email = 'davidmon.17@gmail.com';
-    console.log(`CHECKING USER: ${email}`);
+    const TARGET_EMAIL = 'mapi2710@gmail.com';
+    console.log(`CHECKING USER: ${TARGET_EMAIL}`);
     console.log(`Using Service Key: ${isServiceKey}`);
 
     // 1. Check Invites (Admin table, needs RLS bypass or Service Key)
@@ -36,7 +36,7 @@ async function main() {
         console.error('Error fetching invites:', inviteError.message);
     } else {
         console.log(`TOTAL INVITES: ${allInvites.length}`);
-        const exactMatch = allInvites.find(i => i.email.toLowerCase() === email.toLowerCase());
+        const exactMatch = allInvites.find(i => i.email.toLowerCase() === TARGET_EMAIL.toLowerCase());
         if (exactMatch) {
             console.log('EXACT INVITE FOUND:', exactMatch);
         } else {
@@ -49,12 +49,12 @@ async function main() {
 
     // 2. Check Auth User and Profile (Needs Service Key for Auth)
     if (isServiceKey) {
-        const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+        const { data: { users }, error: authError } = await supabase.auth.admin.listUsers();
         if (authError) {
             console.error('Auth Error:', authError.message);
         } else {
             // Filter locally because listUsers doesn't support filtering by email in all versions/wrappers cleanly here
-            const user = authData.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+            const user = users.find(u => u.email.toLowerCase() === TARGET_EMAIL.toLowerCase());
 
             if (user) {
                 console.log('AUTH USER FOUND. ID:', user.id);
